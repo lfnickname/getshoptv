@@ -7,7 +7,8 @@ interface VideoProps {
 
 const Video: React.FC<VideoProps> = ({status}) => {
     return (
-        <ReactPlayer
+        <div style={status === true ? {}: {display: 'none'}}>
+       <ReactPlayer
         className='video'
         url={'https://www.youtube.com/embed/M7FIvfx5J10'}
         playing={status}
@@ -15,7 +16,8 @@ const Video: React.FC<VideoProps> = ({status}) => {
         height={720}
         muted={true}
         controls={false}
-      />
+        />
+        </div>
     )
 }
 

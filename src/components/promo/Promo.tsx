@@ -4,6 +4,11 @@ import QrCode from '../../img/qr.png'
 import {useAgreeContext } from '../../context';
 import { ReactComponent as Galka } from '../../svg/galka.svg';
 import { ReactComponent as Exit } from '../../svg/exit.svg';
+import { ReactComponent as Next } from '../../svg/next.svg';
+import { ReactComponent as Prev } from '../../svg/prev.svg';
+import background1 from '../../img/final_bg1.png'
+import background2 from '../../img/final_bg2.png'
+import background3 from '../../img/final_bg3.png'
 
 const Promo: React.FC = () => {
     const [focused, setFocused] = useState<string | undefined>('') // focused element
@@ -12,10 +17,29 @@ const Promo: React.FC = () => {
     const [number, setNumber] = useState<string>('') //phone number
     const [isValid, setValid] = useState<boolean>(true)
     const [sendStatus, setSendStatus] = useState<boolean>(false)
+    const [mainStyle, setMainStyle] = useState<object>({})
+    const [slidePage, setSlidePage] = useState<number>(0)
 
     // autofocus при первом рендере
     const myRef = useRef<HTMLButtonElement>(null)
     useEffect(()=>{myRef.current?.focus()}, [])
+
+    useEffect(()=>{
+        console.log(slidePage)
+        switch(slidePage){
+            case 1:
+                setMainStyle({backgroundImage: `url(${background1})`, backgroundSize: '1280px 720px'})
+                return
+            case 2:
+                setMainStyle({backgroundImage: `url(${background2})`, backgroundSize: '1280px 720px'})
+                return
+            case 3:
+                setMainStyle({backgroundImage: `url(${background3})`, backgroundSize: '1280px 720px'})
+                return
+            default:
+                return
+        }
+    }, [slidePage])
 
 
     let showenNumber: string = ''
@@ -35,7 +59,7 @@ const Promo: React.FC = () => {
       
 
     function keyDownHandler(e: React.KeyboardEvent<HTMLInputElement>) {
-        if (focused)
+        if (focused)   
         {
         switch(e.key){
             case 'Enter':
@@ -119,10 +143,11 @@ const Promo: React.FC = () => {
     async function sendHandler () {
         const phone = '7'+number
         const result = await validatePhone(+phone)
-        if (result.valid === true) {
+        if (result.valid === true){
             setValid(true)
             {document.getElementById('99')?.focus()}
             setSendStatus(true)
+            setSlidePage(1)
         }
         else {
             {
@@ -131,18 +156,23 @@ const Promo: React.FC = () => {
         }
     }
 
+    
     async function validatePhone (phone: number) {
           const response = await fetch(`https://phonevalidation.abstractapi.com/v1/?api_key=fb7a381371ae4975b88f1dea6aa37b2c&phone=${phone}`)
           const data = await response.json()
           return data
         }
     return (
-        <div onFocus={()=>{setFocused(document.activeElement?.getAttributeNode('tabIndex')?.value)}} onKeyDown={keyDownHandler} className={styles.promo}>
+        <div style={mainStyle} onFocus={()=>{setFocused(document.activeElement?.getAttributeNode('tabIndex')?.value)}} onKeyDown={keyDownHandler} className={styles.promo}>
             <div className={styles.main}>
             {sendStatus ?
             <div className={styles.send}>
                 <div className={styles.sendtitle}>ЗАЯВКА <br/> ПРИНЯТА</div>
                 <div className={styles.sendsubtitle}>Держите телефон под рукой. <br/>Скоро с Вами свяжется наш менеджер. </div>
+                <div className={styles.button_wrapper}>
+                    <button onClick={()=>{if(slidePage>1) setSlidePage(slidePage-1)}} className={styles.slide_button} tabIndex={12} id='12'><Prev/></button>
+                    <button onClick={()=>{if(slidePage<3) setSlidePage(slidePage+1)}} className={styles.slide_button} tabIndex={13} id='13'><Next/></button>
+                </div>
             </div>
             :
             <div className={styles.content} >
@@ -168,7 +198,7 @@ const Promo: React.FC = () => {
                 <div className={styles.agree_text}>Согласие на обработку<br/>персональных данных</div></div>
                 :
                 <div className={styles.notvalid}>НЕВЕРНО ВВЕДЕН НОМЕР</div>}
-                {showGalka===false || isValid===false ? <button disabled tabIndex={61} id='61' className={styles.suc}>Подтвердить номер</button>
+                {(showGalka===false || isValid===false) || number.length!==10 ? <button disabled tabIndex={61} id='61' className={styles.suc}>Подтвердить номер</button>
                 :
                 <button tabIndex={61} id='61' onClick={()=>sendHandler()} className={styles.suc_enabled}>Подтвердить номер</button>}
             </div>}

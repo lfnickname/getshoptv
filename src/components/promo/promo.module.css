@@ -1,5 +1,9 @@
 .promo {
     position: absolute;
+    background: url('../../img/background.png') ;
+    background-size: 1280px 720px;
+    width: 1280px;
+    height: 720px;
 }
 
 .main {
@@ -75,6 +79,7 @@
 }
 
 .qrwrapper_text {
+    color: white;
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;
@@ -263,4 +268,23 @@ text-align: center;
     line-height: 16px;
     text-align: center;
     color: #000000;
+}
+
+.button_wrapper{
+    position: absolute;
+    left: 575px;
+    top: 660px;
+    display: flex;
+    flex-direction: row;
+}
+
+.slide_button {
+    background: transparent;
+    border: none
+}
+
+.slide_button:hover {
+    background: transparent;
+    border: none;
+    /* outline: blue; */
 }
