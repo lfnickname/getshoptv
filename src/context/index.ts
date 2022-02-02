@@ -1,4 +1,9 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 
-export const AgreeContext = createContext<any>(null)
-export const ExitContext = createContext<any>(false)
+export type AgreeContextType = {
+    agreeStatus: boolean | null
+    setAgreeStatus: (c: boolean) => void
+}
+
+export const AgreeContext = createContext<AgreeContextType>({agreeStatus: null, setAgreeStatus: ()=>{}})
+export const useAgreeContext = () => useContext(AgreeContext)

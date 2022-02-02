@@ -1,25 +1,28 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './promo.module.css'
 import QrCode from '../../img/qr.png'
-import { ExitContext, AgreeContext } from '../../context';
+import {useAgreeContext } from '../../context';
 import { ReactComponent as Galka } from '../../svg/galka.svg';
 import { ReactComponent as Exit } from '../../svg/exit.svg';
 
 const Promo: React.FC = () => {
-    const [focused, setFocused] = useState<any>('') //focused element
-    const {agreeStatus, setAgreeStatus} = useContext<any>(AgreeContext)
-    const [showGalka, setShowGalka] = useState<boolean>(false)
-    const [number, setNumber] = useState<string>('')
+    const [focused, setFocused] = useState<string | undefined>('') // focused element
+    const {agreeStatus, setAgreeStatus} = useAgreeContext()
+    const [showGalka, setShowGalka] = useState<boolean>(false) //custom checkbox
+    const [number, setNumber] = useState<string>('') //phone number
     const [isValid, setValid] = useState<boolean>(true)
     const [sendStatus, setSendStatus] = useState<boolean>(false)
-    const myRef = useRef<any>(null)
-    useEffect(()=>{myRef.current.focus()}, [])
+
+    // autofocus при первом рендере
+    const myRef = useRef<HTMLButtonElement>(null)
+    useEffect(()=>{myRef.current?.focus()}, [])
+
+
     let showenNumber: string = ''
-    console.log(focused)
-      
 
     const spaceEvnt = new KeyboardEvent('keydown', {'keyCode': 32, 'which': 32});
     // DEV ONLY
+    //  представление того, как нужно менять фокус при нажатии arrow buttons
     // const abstractTabIndexMatrix = [
     //     [11, 12, 13, 99],
     //     [21, 22, 23, 99],
@@ -30,9 +33,10 @@ const Promo: React.FC = () => {
     // ]
     // element id = element tabindex
       
+
     function keyDownHandler(e: React.KeyboardEvent<HTMLInputElement>) {
-        console.log(e)
-        console.log(focused)
+        if (focused)
+        {
         switch(e.key){
             case 'Enter':
                 document.dispatchEvent(spaceEvnt);
@@ -98,6 +102,7 @@ const Promo: React.FC = () => {
                 if (!isNaN(+e.key)) panelClickHandler(e.key)
                 return
         }
+    }
     }
     for (let i = 0; i<10; i++){
         showenNumber = showenNumber + (number[i] ? number[i] : '_')

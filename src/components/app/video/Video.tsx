@@ -6,7 +6,6 @@ interface VideoProps {
 }
 
 const Video: React.FC<VideoProps> = ({status}) => {
-    console.log(status, ' = CURRENT STATUS')
     return (
         <ReactPlayer
         className='video'

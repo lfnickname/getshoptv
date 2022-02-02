@@ -1,15 +1,14 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './banner.module.css'
 import QrCode from '../../../img/qr.png'
-import { AgreeContext } from '../../../context';
+import {useAgreeContext } from '../../../context';
 
 const Banner: React.FC = () => {
-    const myRef = useRef<any>(null)
-    const {agreeStatus, setAgreeStatus} = useContext<any>(AgreeContext)
-    useEffect(()=>{myRef.current.focus()}, [])
+    const myRef = useRef<HTMLButtonElement>(null)
+    const {agreeStatus, setAgreeStatus} = useAgreeContext()
+    useEffect(()=>{myRef.current?.focus()}, []) //autofocus at first render
     const spaceEvnt = new KeyboardEvent('keydown', {'keyCode': 32, 'which': 32});
     function keyDownHandler(e: React.KeyboardEvent<HTMLInputElement>) {
-        console.log(e.key)
         if (e.key === 'Enter') {
             document.dispatchEvent(spaceEvnt);
             return
