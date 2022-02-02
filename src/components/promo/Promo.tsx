@@ -10,14 +10,14 @@ const Promo: React.FC = () => {
     const {agreeStatus, setAgreeStatus} = useContext<any>(AgreeContext)
     const [showGalka, setShowGalka] = useState<boolean>(false)
     const [number, setNumber] = useState<string>('')
+    const [isValid, setValid] = useState<boolean>(true)
+    const [sendStatus, setSendStatus] = useState<boolean>(false)
     const myRef = useRef<any>(null)
     useEffect(()=>{myRef.current.focus()}, [])
     let showenNumber: string = ''
     console.log(focused)
       
 
-
-    const backspaceEvnt = new KeyboardEvent('keydown', {'keyCode': 8, 'which': 8});
     const spaceEvnt = new KeyboardEvent('keydown', {'keyCode': 32, 'which': 32});
     // DEV ONLY
     // const abstractTabIndexMatrix = [
@@ -52,6 +52,7 @@ const Promo: React.FC = () => {
                     const newFocus = (+focused[0]-1)
                     document.getElementById(newFocus.toString()+focused[1])?.focus()
                 }
+                else {document.getElementById('11')?.focus()}
                 return
             case 'ArrowDown':
                 if (focused==='33') document.getElementById('42')?.focus()
@@ -65,6 +66,7 @@ const Promo: React.FC = () => {
                 else if (focused[0]==='5') {
                     document.getElementById('61')?.focus()
                 }
+                else {document.getElementById('11')?.focus()}
                 return
             case 'ArrowLeft':
                 if (focused==='99') {
@@ -77,6 +79,7 @@ const Promo: React.FC = () => {
                     const newFocus = (+focused[1]-1)
                     document.getElementById(focused[0] + newFocus.toString())?.focus()
                 }
+                else {document.getElementById('11')?.focus()}
                 return
             case 'ArrowRight':
                 if (focused==='41') {
@@ -89,6 +92,7 @@ const Promo: React.FC = () => {
                     const newFocus = (+focused[1]+1)
                     document.getElementById(focused[0] + newFocus.toString())?.focus()
                 }
+                else {document.getElementById('11')?.focus()}
                 return
             default:
                 if (!isNaN(+e.key)) panelClickHandler(e.key)
@@ -99,16 +103,46 @@ const Promo: React.FC = () => {
         showenNumber = showenNumber + (number[i] ? number[i] : '_')
     }
     function panelClickHandler (value: string){
-        if (number.length<10) setNumber(number + value)
+        if (number.length<10) {
+            setNumber(number + value)
+            setValid(true)}
     }
     function backspaceClickHandler (){
+        setValid(true)
         if (number.length>0) setNumber(number.slice(0, number.length-1))
     }
+    async function sendHandler () {
+        const phone = '7'+number
+        const result = await validatePhone(+phone)
+        if (result.valid === true) {
+            setValid(true)
+            {document.getElementById('99')?.focus()}
+            setSendStatus(true)
+        }
+        else {
+            {
+            setValid(false)
+            document.getElementById('11')?.focus()}
+        }
+    }
+
+    async function validatePhone (phone: number) {
+          const response = await fetch(`https://phonevalidation.abstractapi.com/v1/?api_key=fb7a381371ae4975b88f1dea6aa37b2c&phone=${phone}`)
+          const data = await response.json()
+          return data
+        }
     return (
         <div onFocus={()=>{setFocused(document.activeElement?.getAttributeNode('tabIndex')?.value)}} onKeyDown={keyDownHandler} className={styles.promo}>
-            <div className={styles.main_content}>
+            <div className={styles.main}>
+            {sendStatus ?
+            <div className={styles.send}>
+                <div className={styles.sendtitle}>ЗАЯВКА <br/> ПРИНЯТА</div>
+                <div className={styles.sendsubtitle}>Держите телефон под рукой. <br/>Скоро с Вами свяжется наш менеджер. </div>
+            </div>
+            :
+            <div className={styles.content} >
                 <div className={styles.upper_text}>Введите ваш номер<br/>мобильного телефона</div>
-                <div className={styles.number}>+7({showenNumber.slice(0,3)}){showenNumber.slice(3,6)}-{showenNumber.slice(6,8)}-{showenNumber.slice(8,10)}</div>
+                <div className={isValid ? styles.number : (`${styles.number} ${styles.red}`)}>+7({showenNumber.slice(0,3)}){showenNumber.slice(3,6)}-{showenNumber.slice(6,8)}-{showenNumber.slice(8,10)}</div>
                 <div className={styles.lower_text}>и с Вами свяжется наш менеждер для <br/>дальнейшей консультации</div>
                 <div className={styles.panel}>
                     <button tabIndex={11} id='11' ref={myRef} onClick={()=>{panelClickHandler('1')}} className={styles.panel_button}>1</button>
@@ -123,19 +157,23 @@ const Promo: React.FC = () => {
                     <button tabIndex={41} id='41' onClick={()=>{backspaceClickHandler()}} className={styles.panel_button_big}>Стереть</button>
                     <button tabIndex={42} id='42' onClick={()=>{panelClickHandler('0')}} className={styles.panel_button}>0</button>
                 </div>
+                {isValid ? 
                 <div className={styles.agree}>
-                    <button tabIndex={51}  id='51' onClick={()=>{setShowGalka(!showGalka)}} className={styles.agree_but}><div className={styles.galkawrapper}>{showGalka ? <Galka width={34} height={32}/> : <span/>}</div></button>
-                    <div className={styles.agree_text}>Согласие на обработку<br/>персональных данных</div></div>
-                {!showGalka ? <button disabled tabIndex={61} id='61' className={styles.suc}>Подтвердить номер</button>
+                <button tabIndex={51}  id='51' onClick={()=>{setShowGalka(!showGalka)}} className={styles.agree_but}><div className={styles.galkawrapper}>{showGalka ? <Galka width={34} height={32}/> : <span/>}</div></button>
+                <div className={styles.agree_text}>Согласие на обработку<br/>персональных данных</div></div>
                 :
-                <button tabIndex={61} id='61' className={styles.suc_enabled}>Подтвердить номер</button>}
-            </div>
+                <div className={styles.notvalid}>НЕВЕРНО ВВЕДЕН НОМЕР</div>}
+                {showGalka===false || isValid===false ? <button disabled tabIndex={61} id='61' className={styles.suc}>Подтвердить номер</button>
+                :
+                <button tabIndex={61} id='61' onClick={()=>sendHandler()} className={styles.suc_enabled}>Подтвердить номер</button>}
+            </div>}
             <button tabIndex={99}  id='99' onClick={()=>{setAgreeStatus(false)}} className={styles.exit}>
-                <Exit/>
+                <Exit width={32} height={32} className={styles.exitsvg}/>
             </button>
             <div className={styles.qrwrapper}>
                 <div className={styles.qrwrapper_text}>Сканируйте QR-код ДЛЯ ПОЛУЧЕНИЯ ДОПОЛНИТЕЛЬНОЙ ИНФОРМАЦИИ</div>
                 <img src={QrCode} width={110}/>
+            </div>
             </div>
         </div>
     );
